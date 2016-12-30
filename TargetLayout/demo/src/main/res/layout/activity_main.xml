@@ -20,7 +20,7 @@
         android:layout_weight="0.5"
         app:levelDrawable="@drawable/levels"
         app:max_number_of_levels="4"
-        app:center_percent="0.7"
+        app:center_percent="0.5"
         app:step_percent="0.2"/>
 
     <LinearLayout

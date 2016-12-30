@@ -41,15 +41,6 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
-        fixStepPercentIfNeeded(width, height);
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
 
         int canvasWidth = canvas.getWidth();
@@ -59,6 +50,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         Log.i(TAG, String.format(Locale.getDefault(), "canvas width: %d, height: %d", canvasWidth, canvasHeight));
         Target.Level current = target.getCurrentLevel();
         if (current != null) {
+            fixStepPercentIfNeeded(canvasWidth, canvasHeight);
             for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
                 // draw always from the first drawable to the last
                 levelListDrawable.setLevel(position - current.getPosition());
@@ -128,14 +120,16 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     }
 
     private void fixStepPercentIfNeeded(int width, int height) {
-
+        int maxViewSize = Math.min(width, height);
         Target.Level maxLevel = target.getLevelAt(maxNumberOfLevels - 1);
-        if (maxLevel != null) {
+        Target.Level centerLevel = target.getLevelAt(0);
+        if (maxLevel != null && centerLevel != null) {
             computeDrawingBounds(width, height, maxLevel.getSizePercent());
             int maxLevelSize = drawingBounds.width();
-            int maxViewSize = Math.min(width, height);
+            computeDrawingBounds(width, height, centerLevel.getSizePercent());
+            int centerSize = drawingBounds.width();
             if (maxLevelSize > maxViewSize) {
-                stepPercent = (float) (maxLevelSize - maxViewSize) / (maxViewSize * (maxNumberOfLevels - 1));
+                stepPercent = (float) (maxViewSize - centerSize) / (maxViewSize * (maxNumberOfLevels - 1));
                 updateTarget();
             }
         }
