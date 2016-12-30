@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="TargetLayout">
+        <attr name="center_percent" format="float"/>
+        <attr name="step_percent" format="float"/>
+        <attr name="max_number_of_levels" format="integer"/>
+        <attr name="levelDrawable" format="integer"/>
+    </declare-styleable>
+
+</resources>

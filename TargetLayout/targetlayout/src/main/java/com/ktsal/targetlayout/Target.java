@@ -22,6 +22,10 @@ public class Target implements TargetAction {
         return levels.get(currentPosition);
     }
 
+    public Level getLevelAt(int position) {
+        return levels.get(position);
+    }
+
     @Override
     public void increment() {
         if (hasUpperBoundAtCurrent())
