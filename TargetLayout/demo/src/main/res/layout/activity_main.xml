@@ -11,22 +11,33 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.ktsal.targetlayout.demo.MainActivity"
-    android:weightSum="1">
+    android:gravity="center">
 
     <com.ktsal.targetlayout.TargetLayout
         android:id="@+id/targetLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_height="250dp"
         app:levelDrawable="@drawable/levels"
         app:max_number_of_levels="4"
         app:center_percent="0.5"
-        app:step_percent="0.2"/>
+        app:step_percent="0.2">
+
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@color/colorAccent"/>
+
+        </FrameLayout>
+
+    </com.ktsal.targetlayout.TargetLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_height="wrap_content"
         android:gravity="center">
 
         <Button

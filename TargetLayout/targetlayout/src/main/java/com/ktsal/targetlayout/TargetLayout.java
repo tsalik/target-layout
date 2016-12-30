@@ -8,12 +8,12 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class TargetLayout extends FrameLayout implements TargetAction {
 
@@ -29,6 +29,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private int maxNumberOfLevels;
     private LevelListDrawable levelListDrawable;
     private Rect drawingBounds = new Rect();
+    private View centerView;
 
     public TargetLayout(Context context) {
         super(context);
@@ -41,13 +42,41 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     }
 
     @Override
+    protected void onFinishInflate() {
+
+        if (getChildCount() > 1)
+            throw new IllegalStateException("TargetLayout can have exactly one child");
+
+        centerView = getChildAt(0);
+        if (centerView != null) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
+            lp.gravity = Gravity.CENTER;
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if (centerView != null) {
+
+            Target.Level level = target.getLevelAt(0);
+            float sizePercent = level.getSizePercent();
+            int targetLayoutSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
+            int centerViewSize = Math.round(targetLayoutSize * sizePercent);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
+            lp.width = centerViewSize;
+            lp.height = centerViewSize;
+        }
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
 
         int canvasWidth = canvas.getWidth();
 
         int canvasHeight = canvas.getHeight();
 
-        Log.i(TAG, String.format(Locale.getDefault(), "canvas width: %d, height: %d", canvasWidth, canvasHeight));
         Target.Level current = target.getCurrentLevel();
         if (current != null) {
             fixStepPercentIfNeeded(canvasWidth, canvasHeight);
@@ -116,7 +145,6 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         int radius = Math.round((size * percent) / 2);
 
         drawingBounds.set(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
-        Log.i(TAG, String.format(Locale.getDefault(), "drawing width: %d, height: %d", drawingBounds.width(), drawingBounds.height()));
     }
 
     private void fixStepPercentIfNeeded(int width, int height) {
