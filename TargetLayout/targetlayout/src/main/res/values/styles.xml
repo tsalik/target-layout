@@ -6,6 +6,7 @@
         <attr name="step_percent" format="float"/>
         <attr name="max_number_of_levels" format="integer"/>
         <attr name="levelDrawable" format="integer"/>
+        <attr name="center_view_margin" format="dimension"/>
     </declare-styleable>
 
 </resources>

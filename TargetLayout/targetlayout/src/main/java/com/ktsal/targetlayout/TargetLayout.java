@@ -26,6 +26,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private static final float DEFAULT_CENTER_PERCENT = 0F;
     private static final float DEFAULT_STEP_PERCENT = 0F;
     private static final int DEFAULT_MAX_NUMBER_OF_LEVELS = 0;
+    private static final int DEFAULT_CENTER_VIEW_MARGIN = 0;
 
     private Target target;
     private float centerPercent;
@@ -34,6 +35,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private LevelListDrawable levelListDrawable;
     private Rect drawingBounds = new Rect();
     private View centerView;
+    private float centerViewMargin;
     private Interpolator centerViewInterpolator = new BounceInterpolator();
 
     public TargetLayout(Context context) {
@@ -68,7 +70,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
             Target.Level level = target.getLevelAt(0);
             float sizePercent = level.getSizePercent();
             int targetLayoutSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
-            int centerViewSize = Math.round(targetLayoutSize * sizePercent);
+            int centerViewSize = Math.round((targetLayoutSize * sizePercent) - centerViewMargin);
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
             lp.width = centerViewSize;
             lp.height = centerViewSize;
@@ -130,6 +132,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("a LevelListDrawable must be passed");
             }
+            centerViewMargin = ta.getDimensionPixelSize(R.styleable.TargetLayout_center_view_margin, DEFAULT_CENTER_VIEW_MARGIN) * 4;
             updateTarget();
             ta.recycle();
         }

@@ -20,7 +20,8 @@
         app:levelDrawable="@drawable/levels"
         app:max_number_of_levels="4"
         app:center_percent="0.5"
-        app:step_percent="0.2">
+        app:step_percent="0.2"
+        app:center_view_margin="5dp">
 
         <FrameLayout
             android:layout_width="30dp"
