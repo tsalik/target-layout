@@ -1,6 +1,8 @@
 package com.ktsal.targetlayout;
 
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -10,6 +12,8 @@ import android.graphics.drawable.LevelListDrawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private LevelListDrawable levelListDrawable;
     private Rect drawingBounds = new Rect();
     private View centerView;
+    private Interpolator centerViewInterpolator = new BounceInterpolator();
 
     public TargetLayout(Context context) {
         super(context);
@@ -95,18 +100,21 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     public void increment() {
         target.increment();
         invalidate();
+        animateLevelTransition();
     }
 
     @Override
     public void setPosition(int position) {
         target.setPosition(position);
         invalidate();
+        animateLevelTransition();
     }
 
     @Override
     public void decrement() {
         target.decrement();
         invalidate();
+        animateLevelTransition();
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -161,6 +169,19 @@ public class TargetLayout extends FrameLayout implements TargetAction {
                 updateTarget();
             }
         }
+    }
+
+    private void animateLevelTransition() {
+        float scaleFrom = centerView.getScaleX();
+        Target.Level currentLevel = target.getCurrentLevel();
+        float scaleTo = currentLevel.getSizePercent() / target.getLevelAt(0).getSizePercent();
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(centerView, "scaleX", scaleFrom, scaleTo);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(centerView, "scaleY", scaleFrom, scaleTo);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setDuration(500);
+        animatorSet.setInterpolator(centerViewInterpolator);
+        animatorSet.play(scaleX).with(scaleY);
+        animatorSet.start();
     }
 
 }
