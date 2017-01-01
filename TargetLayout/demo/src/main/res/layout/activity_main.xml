@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         app:levelDrawable="@drawable/levels"
-        app:max_number_of_levels="2"
+        app:max_number_of_levels="3"
         app:center_percent="0.45"
         app:step_percent="0.2">
 
@@ -31,6 +31,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@color/colorAccent"/>
+
+            <TextView
+                android:id="@+id/programmerLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
 
         </FrameLayout>
 

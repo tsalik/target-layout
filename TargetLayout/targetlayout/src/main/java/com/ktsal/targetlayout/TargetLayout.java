@@ -6,10 +6,12 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -17,14 +19,13 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TargetLayout extends FrameLayout implements TargetAction, View.OnTouchListener {
-
-    private static final String TAG = TargetLayout.class.getSimpleName();
 
     private static final float DEFAULT_CENTER_PERCENT = 0F;
     private static final float DEFAULT_STEP_PERCENT = 0F;
@@ -41,6 +42,16 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     private boolean allowGestureEvents = true;
     private ScaleGestureDetector scaleGestureDetector;
     private float scaleFactor = 1f;
+    private OnLevelChangedListener onLevelChangedListener;
+    private BaseAdapter adapter;
+    private DataSetObserver dataSetObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            updateMaxNumberOfLevels();
+            notifyLevelChanged();
+            invalidate();
+        }
+    };
 
     public TargetLayout(Context context) {
         super(context);
@@ -76,8 +87,8 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             int targetLayoutSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
             int centerViewSize = Math.round((targetLayoutSize * sizePercent));
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
-            lp.width = centerViewSize - (lp.leftMargin + lp.rightMargin) - 10;
-            lp.height = centerViewSize - (lp.topMargin + lp.bottomMargin) - 10;
+            lp.width = centerViewSize - (lp.leftMargin + lp.rightMargin);
+            lp.height = centerViewSize - (lp.topMargin + lp.bottomMargin);
         }
     }
 
@@ -88,16 +99,18 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
 
         int canvasHeight = canvas.getHeight();
 
-        Target.Level current = target.getCurrentLevel();
-        if (current != null) {
-            fixStepPercentIfNeeded(canvasWidth, canvasHeight);
-            for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
-                // draw always from the first drawable to the last
-                levelListDrawable.setLevel(position - current.getPosition());
-                Drawable drawable = levelListDrawable.getCurrent();
-                computeDrawingBounds(canvasWidth, canvasHeight, target.getLevelAt(position).getSizePercent());
-                drawable.setBounds(drawingBounds);
-                drawable.draw(canvas);
+        if (adapter != null && !adapter.isEmpty()) {
+            Target.Level current = target.getCurrentLevel();
+            if (current != null) {
+                fixStepPercentIfNeeded(canvasWidth, canvasHeight);
+                for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
+                    // draw always from the first drawable to the last
+                    levelListDrawable.setLevel(position - current.getPosition());
+                    Drawable drawable = levelListDrawable.getCurrent();
+                    computeDrawingBounds(canvasWidth, canvasHeight, target.getLevelAt(position).getSizePercent());
+                    drawable.setBounds(drawingBounds);
+                    drawable.draw(canvas);
+                }
             }
         }
     }
@@ -107,6 +120,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         target.increment();
         invalidate();
         animateLevelTransition();
+        notifyLevelChanged();
     }
 
     @Override
@@ -114,6 +128,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         target.setPosition(position);
         invalidate();
         animateLevelTransition();
+        notifyLevelChanged();
     }
 
     @Override
@@ -121,6 +136,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         target.decrement();
         invalidate();
         animateLevelTransition();
+        notifyLevelChanged();
     }
 
     public void allowGestureEvents(boolean allow) {
@@ -129,6 +145,28 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             setOnTouchListener(this);
         else
             setOnTouchListener(null);
+    }
+
+    public void setOnLevelChangedListener(OnLevelChangedListener onLevelChangedListener) {
+        this.onLevelChangedListener = onLevelChangedListener;
+    }
+
+    public void setAdapter(@NonNull BaseAdapter baseAdapter) {
+        if (adapter != null)
+            adapter.unregisterDataSetObserver(dataSetObserver);
+
+        adapter = baseAdapter;
+        adapter.registerDataSetObserver(dataSetObserver);
+    }
+
+    private void notifyLevelChanged() {
+        if (onLevelChangedListener != null)
+            onLevelChangedListener.onLevelChanged(target.getCurrentLevel().getPosition());
+    }
+
+    public void updateMaxNumberOfLevels() {
+        if (adapter != null)
+            maxNumberOfLevels = Math.min(maxNumberOfLevels, adapter.getCount());
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -284,6 +322,10 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         private boolean needsDecrement(boolean grow) {
             return !grow && target.hasLowerBoundAtCurrent() && scaleFactor < getScaleFactor(target.getBound(false));
         }
+    }
+
+    public interface OnLevelChangedListener {
+        void onLevelChanged(int position);
     }
 
 

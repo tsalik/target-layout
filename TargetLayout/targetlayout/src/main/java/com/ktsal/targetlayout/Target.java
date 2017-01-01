@@ -23,7 +23,10 @@ public class Target implements TargetAction {
     }
 
     public Level getLevelAt(int position) {
-        return levels.get(position);
+        if (isWithinBounds(position))
+            return levels.get(position);
+        else
+            return null;
     }
 
     @Override

@@ -3,12 +3,18 @@ package com.ktsal.targetlayout.demo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ktsal.targetlayout.TargetLayout;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements TargetLayout.OnLevelChangedListener {
 
     private TargetLayout targetLayout;
+    private List<ProgrammerLevel> programmerLevels;
+    private TextView programmerLevelTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,5 +33,21 @@ public class MainActivity extends AppCompatActivity {
                 targetLayout.decrement();
             }
         });
+        programmerLevels = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            programmerLevels.add(new ProgrammerLevel(i, "level: " + i));
+        }
+        programmerLevelTextView = (TextView) findViewById(R.id.programmerLevel);
+        targetLayout.setOnLevelChangedListener(this);
+        ArrayAdapter<ProgrammerLevel> programmerLevelArrayAdapter = new ArrayAdapter<>();
+        targetLayout.setAdapter(programmerLevelArrayAdapter);
+        programmerLevelArrayAdapter.updateItems(programmerLevels);
+    }
+
+
+    @Override
+    public void onLevelChanged(int position) {
+        ProgrammerLevel programmerLevel = programmerLevels.get(position);
+        programmerLevelTextView.setText(programmerLevel.getTitle());
     }
 }
