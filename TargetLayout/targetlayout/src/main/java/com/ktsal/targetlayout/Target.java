@@ -64,6 +64,21 @@ public class Target implements TargetAction {
         return position >= 0 && position < levels.size();
     }
 
+    public float getBound(boolean grow) {
+        Level current = getCurrentLevel();
+        Level target = null;
+        if (grow && hasUpperBoundAtCurrent()) {
+            target = getLevelAt(currentPosition + 1);
+        } else if (!grow & hasLowerBoundAtCurrent()) {
+            target = getLevelAt(currentPosition - 1);
+        }
+
+        if (target != null)
+            return ((target.getSizePercent() + current.getSizePercent())) / 2;
+        else
+            return 0;
+    }
+
     public static class Level {
 
         private final int position;

@@ -1,6 +1,7 @@
 package com.ktsal.targetlayout;
 
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -11,6 +12,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
@@ -19,14 +22,13 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TargetLayout extends FrameLayout implements TargetAction {
+public class TargetLayout extends FrameLayout implements TargetAction, View.OnTouchListener {
 
     private static final String TAG = TargetLayout.class.getSimpleName();
 
     private static final float DEFAULT_CENTER_PERCENT = 0F;
     private static final float DEFAULT_STEP_PERCENT = 0F;
     private static final int DEFAULT_MAX_NUMBER_OF_LEVELS = 0;
-    private static final int DEFAULT_CENTER_VIEW_MARGIN = 0;
 
     private Target target;
     private float centerPercent;
@@ -35,8 +37,10 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private LevelListDrawable levelListDrawable;
     private Rect drawingBounds = new Rect();
     private View centerView;
-    private float centerViewMargin;
     private Interpolator centerViewInterpolator = new BounceInterpolator();
+    private boolean allowGestureEvents = true;
+    private ScaleGestureDetector scaleGestureDetector;
+    private float scaleFactor = 1f;
 
     public TargetLayout(Context context) {
         super(context);
@@ -70,10 +74,10 @@ public class TargetLayout extends FrameLayout implements TargetAction {
             Target.Level level = target.getLevelAt(0);
             float sizePercent = level.getSizePercent();
             int targetLayoutSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
-            int centerViewSize = Math.round((targetLayoutSize * sizePercent) - centerViewMargin);
+            int centerViewSize = Math.round((targetLayoutSize * sizePercent));
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
-            lp.width = centerViewSize;
-            lp.height = centerViewSize;
+            lp.width = centerViewSize - (lp.leftMargin + lp.rightMargin) - 10;
+            lp.height = centerViewSize - (lp.topMargin + lp.bottomMargin) - 10;
         }
     }
 
@@ -119,6 +123,14 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         animateLevelTransition();
     }
 
+    public void allowGestureEvents(boolean allow) {
+        allowGestureEvents = allow;
+        if (allowGestureEvents)
+            setOnTouchListener(this);
+        else
+            setOnTouchListener(null);
+    }
+
     private void init(Context context, AttributeSet attrs) {
 
         setWillNotDraw(false);
@@ -132,9 +144,14 @@ public class TargetLayout extends FrameLayout implements TargetAction {
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("a LevelListDrawable must be passed");
             }
-            centerViewMargin = ta.getDimensionPixelSize(R.styleable.TargetLayout_center_view_margin, DEFAULT_CENTER_VIEW_MARGIN) * 4;
             updateTarget();
             ta.recycle();
+        }
+
+        if (allowGestureEvents) {
+            ScaleListener scaleListener = new ScaleListener();
+            scaleGestureDetector = new ScaleGestureDetector(context, scaleListener);
+            setOnTouchListener(this);
         }
     }
 
@@ -177,7 +194,7 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private void animateLevelTransition() {
         float scaleFrom = centerView.getScaleX();
         Target.Level currentLevel = target.getCurrentLevel();
-        float scaleTo = currentLevel.getSizePercent() / target.getLevelAt(0).getSizePercent();
+        float scaleTo = getScaleFactor(currentLevel.getSizePercent());
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(centerView, "scaleX", scaleFrom, scaleTo);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(centerView, "scaleY", scaleFrom, scaleTo);
         AnimatorSet animatorSet = new AnimatorSet();
@@ -185,6 +202,89 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         animatorSet.setInterpolator(centerViewInterpolator);
         animatorSet.play(scaleX).with(scaleY);
         animatorSet.start();
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                allowGestureEvents(false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                allowGestureEvents(true);
+                scaleFactor = getScaleFactor(target.getCurrentLevel().getSizePercent());
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
+
+    private float getScaleFactor(float sizePercent) {
+        Target.Level first = target.getLevelAt(0);
+        return sizePercent / first.getSizePercent();
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        scaleGestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        private boolean levelChanged;
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+
+            scaleFactor *= detector.getScaleFactor();
+
+            // the scaleFactor can be as small as 1f or as big as the max level
+            scaleFactor = Math.max(0.9f, Math.min(scaleFactor, getScaleFactor(target.getLevelAt(maxNumberOfLevels - 1).getSizePercent()) + 0.1f));
+
+            boolean grow = scaleFactor > centerView.getScaleX();
+
+            if (needsIncrement(grow)) {
+                increment();
+                levelChanged = true;
+                allowGestureEvents(false);
+                return true;
+            } else if (needsDecrement(grow)) {
+                decrement();
+                levelChanged = true;
+                allowGestureEvents(false);
+                return true;
+            }
+
+            levelChanged = false;
+            centerView.setScaleX(scaleFactor);
+            centerView.setScaleY(scaleFactor);
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            if (!levelChanged) {
+                animateLevelTransition();
+                scaleFactor = getScaleFactor(target.getCurrentLevel().getSizePercent());
+            }
+        }
+
+        private boolean needsIncrement(boolean grow) {
+            return grow && target.hasUpperBoundAtCurrent() && scaleFactor > getScaleFactor(target.getBound(true));
+        }
+
+        private boolean needsDecrement(boolean grow) {
+            return !grow && target.hasLowerBoundAtCurrent() && scaleFactor < getScaleFactor(target.getBound(false));
+        }
+    }
+
 
 }

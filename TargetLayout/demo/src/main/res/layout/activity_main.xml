@@ -16,16 +16,16 @@
     <com.ktsal.targetlayout.TargetLayout
         android:id="@+id/targetLayout"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="300dp"
         app:levelDrawable="@drawable/levels"
-        app:max_number_of_levels="4"
-        app:center_percent="0.5"
-        app:step_percent="0.2"
-        app:center_view_margin="5dp">
+        app:max_number_of_levels="2"
+        app:center_percent="0.45"
+        app:step_percent="0.2">
 
         <FrameLayout
             android:layout_width="30dp"
-            android:layout_height="30dp">
+            android:layout_height="30dp"
+            android:layout_margin="5dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="match_parent"
