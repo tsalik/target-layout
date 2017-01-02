@@ -25,18 +25,20 @@
         <FrameLayout
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_margin="5dp">
+            android:layout_margin="10dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@color/colorAccent"/>
+                android:src="@color/colorAccent"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/programmerLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"/>
 
         </FrameLayout>
 

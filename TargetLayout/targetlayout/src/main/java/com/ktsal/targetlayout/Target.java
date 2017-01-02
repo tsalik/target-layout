@@ -4,25 +4,25 @@ package com.ktsal.targetlayout;
 import java.util.List;
 import java.util.Locale;
 
-public class Target implements TargetAction {
+class Target implements TargetAction {
 
     private List<Level> levels;
     private int currentPosition;
 
-    public Target(List<Level> levels) {
+    Target(List<Level> levels) {
         this(levels, 0);
     }
 
-    public Target(List<Level> levels, int initialPosition) {
+    Target(List<Level> levels, int initialPosition) {
         this.levels = levels;
         currentPosition = initialPosition;
     }
 
-    public Level getCurrentLevel() {
+    Level getCurrentLevel() {
         return levels.get(currentPosition);
     }
 
-    public Level getLevelAt(int position) {
+    Level getLevelAt(int position) {
         if (isWithinBounds(position))
             return levels.get(position);
         else
@@ -47,27 +47,27 @@ public class Target implements TargetAction {
             currentPosition--;
     }
 
-    public boolean hasUpperBoundAtCurrent() {
+    boolean hasUpperBoundAtCurrent() {
         return hasUpperBoundsAtPosition(currentPosition);
     }
 
-    public boolean hasUpperBoundsAtPosition(int position) {
+    boolean hasUpperBoundsAtPosition(int position) {
         return position < levels.size() - 1;
     }
 
-    public boolean hasLowerBoundAtCurrent() {
+    boolean hasLowerBoundAtCurrent() {
         return hasLowerBoundAtPosition(currentPosition);
     }
 
-    public boolean hasLowerBoundAtPosition(int position) {
+    boolean hasLowerBoundAtPosition(int position) {
         return position > 0;
     }
 
-    public boolean isWithinBounds(int position) {
+    boolean isWithinBounds(int position) {
         return position >= 0 && position < levels.size();
     }
 
-    public float getBound(boolean grow) {
+    float getBound(boolean grow) {
         Level current = getCurrentLevel();
         Level target = null;
         if (grow && hasUpperBoundAtCurrent()) {
@@ -82,21 +82,21 @@ public class Target implements TargetAction {
             return 0;
     }
 
-    public static class Level {
+    static class Level {
 
         private final int position;
         private final float sizePercent;
 
-        public Level(int position, float sizePercent) {
+        Level(int position, float sizePercent) {
             this.position = position;
             this.sizePercent = sizePercent;
         }
 
-        public int getPosition() {
+        int getPosition() {
             return position;
         }
 
-        public float getSizePercent() {
+        float getSizePercent() {
             return sizePercent;
         }
 

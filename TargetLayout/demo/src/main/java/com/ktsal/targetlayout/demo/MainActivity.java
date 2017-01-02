@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
             }
         });
         programmerLevels = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             programmerLevels.add(new ProgrammerLevel(i, "level: " + i));
         }
         programmerLevelTextView = (TextView) findViewById(R.id.programmerLevel);
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
         ArrayAdapter<ProgrammerLevel> programmerLevelArrayAdapter = new ArrayAdapter<>();
         targetLayout.setAdapter(programmerLevelArrayAdapter);
         programmerLevelArrayAdapter.updateItems(programmerLevels);
+        targetLayout.setPosition(1);
     }
 
 
@@ -50,4 +51,5 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
         ProgrammerLevel programmerLevel = programmerLevels.get(position);
         programmerLevelTextView.setText(programmerLevel.getTitle());
     }
+
 }

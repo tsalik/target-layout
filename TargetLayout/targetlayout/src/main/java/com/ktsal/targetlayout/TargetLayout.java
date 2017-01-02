@@ -30,6 +30,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     private static final float DEFAULT_CENTER_PERCENT = 0F;
     private static final float DEFAULT_STEP_PERCENT = 0F;
     private static final int DEFAULT_MAX_NUMBER_OF_LEVELS = 0;
+    private static final int DEFAULT_CENTER_VIEW_ANIMATION_DURATION = 500;
 
     private Target target;
     private float centerPercent;
@@ -39,6 +40,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     private Rect drawingBounds = new Rect();
     private View centerView;
     private Interpolator centerViewInterpolator = new BounceInterpolator();
+    private int centerViewAnimationDuration = DEFAULT_CENTER_VIEW_ANIMATION_DURATION;
     private boolean allowGestureEvents = true;
     private ScaleGestureDetector scaleGestureDetector;
     private float scaleFactor = 1f;
@@ -118,25 +120,19 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     @Override
     public void increment() {
         target.increment();
-        invalidate();
-        animateLevelTransition();
-        notifyLevelChanged();
+        redraw();
     }
 
     @Override
     public void setPosition(int position) {
         target.setPosition(position);
-        invalidate();
-        animateLevelTransition();
-        notifyLevelChanged();
+        redraw();
     }
 
     @Override
     public void decrement() {
         target.decrement();
-        invalidate();
-        animateLevelTransition();
-        notifyLevelChanged();
+        redraw();
     }
 
     public void allowGestureEvents(boolean allow) {
@@ -159,14 +155,33 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         adapter.registerDataSetObserver(dataSetObserver);
     }
 
-    private void notifyLevelChanged() {
-        if (onLevelChangedListener != null)
-            onLevelChangedListener.onLevelChanged(target.getCurrentLevel().getPosition());
-    }
-
     public void updateMaxNumberOfLevels() {
         if (adapter != null)
             maxNumberOfLevels = Math.min(maxNumberOfLevels, adapter.getCount());
+        updateTarget();
+    }
+
+    public void setCenterViewInterpolator(@NonNull Interpolator centerViewInterpolator) {
+        this.centerViewInterpolator = centerViewInterpolator;
+    }
+
+    public void setCenterViewAnimationDuration(int centerViewAnimationDuration) {
+        this.centerViewAnimationDuration = centerViewAnimationDuration;
+    }
+
+    public void setLevelListDrawable(@NonNull LevelListDrawable levelListDrawable) {
+        this.levelListDrawable = levelListDrawable;
+    }
+
+    private void redraw() {
+        invalidate();
+        animateLevelTransition();
+        notifyLevelChanged();
+    }
+
+    private void notifyLevelChanged() {
+        if (onLevelChangedListener != null)
+            onLevelChangedListener.onLevelChanged(target.getCurrentLevel().getPosition());
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -200,7 +215,8 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             levels.add(new Target.Level(position, sizePercent));
             sizePercent += stepPercent;
         }
-        target = new Target(levels);
+        int initialPosition = target == null ? 0 : target.getCurrentLevel().getPosition();
+        target = new Target(levels, initialPosition);
     }
 
     private void computeDrawingBounds(int width, int height, float percent) {
@@ -236,7 +252,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(centerView, "scaleX", scaleFrom, scaleTo);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(centerView, "scaleY", scaleFrom, scaleTo);
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.setDuration(500);
+        animatorSet.setDuration(centerViewAnimationDuration);
         animatorSet.setInterpolator(centerViewInterpolator);
         animatorSet.play(scaleX).with(scaleY);
         animatorSet.start();
@@ -327,6 +343,5 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     public interface OnLevelChangedListener {
         void onLevelChanged(int position);
     }
-
 
 }
