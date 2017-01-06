@@ -80,17 +80,23 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
         if (centerView != null) {
+            int width = MeasureSpec.getSize(widthMeasureSpec);
+            int height = MeasureSpec.getSize(heightMeasureSpec);
 
             Target.Level level = target.getLevelAt(0);
             float sizePercent = level.getSizePercent();
-            int targetLayoutSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
+            int targetLayoutSize = Math.min(width, height);
             int centerViewSize = Math.round((targetLayoutSize * sizePercent));
+
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
-            lp.width = centerViewSize - (lp.leftMargin + lp.rightMargin);
-            lp.height = centerViewSize - (lp.topMargin + lp.bottomMargin);
+            int widthMargins = lp.leftMargin + lp.rightMargin;
+            int heightMargins = lp.topMargin + lp.bottomMargin;
+
+            int centerViewWidthMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - widthMargins, MeasureSpec.EXACTLY);
+            int centerViewHeightMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - heightMargins, MeasureSpec.EXACTLY);
+            centerView.measure(centerViewWidthMeasureSpec, centerViewHeightMeasureSpec);
+            setMeasuredDimension(width, height);
         }
     }
 
