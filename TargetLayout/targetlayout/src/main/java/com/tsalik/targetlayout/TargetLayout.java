@@ -112,7 +112,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             int centerViewWidthMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - widthMargins, MeasureSpec.EXACTLY);
             int centerViewHeightMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - heightMargins, MeasureSpec.EXACTLY);
             centerView.measure(centerViewWidthMeasureSpec, centerViewHeightMeasureSpec);
-            setMeasuredDimension(targetLayoutSize, targetLayoutSize);
+            setMeasuredDimension(targetLayoutWidth, targetLayoutHeight);
         }
     }
 

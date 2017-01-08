@@ -11,17 +11,16 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.tsalik.targetlayout.demo.MainActivity"
-    android:gravity="center"
-    android:weightSum="1">
+    android:gravity="center">
 
     <com.tsalik.targetlayout.TargetLayout
         android:id="@+id/targetLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:levelDrawable="@drawable/levels"
         app:max_number_of_levels="10"
         app:center_percent="0.45"
-        app:step_percent="0.15">
+        app:step_percent="0.2">
 
         <FrameLayout
             android:layout_width="30dp"
