@@ -1,4 +1,4 @@
-package com.ktsal.targetlayout;
+package com.tsalik.targetlayout;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

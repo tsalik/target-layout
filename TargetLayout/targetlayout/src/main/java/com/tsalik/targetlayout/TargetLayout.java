@@ -1,4 +1,4 @@
-package com.ktsal.targetlayout;
+package com.tsalik.targetlayout;
 
 
 import android.animation.Animator;
@@ -51,7 +51,6 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         public void onChanged() {
             updateMaxNumberOfLevels();
             notifyLevelChanged();
-            invalidate();
         }
     };
 
@@ -81,12 +80,29 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (centerView != null) {
-            int width = MeasureSpec.getSize(widthMeasureSpec);
-            int height = MeasureSpec.getSize(heightMeasureSpec);
+            int targetLayoutWidth = MeasureSpec.getSize(widthMeasureSpec);
+            int targetLayoutHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+            fixStepPercentIfNeeded(targetLayoutWidth, targetLayoutHeight);
+
+            // fix size in case of wrap_content
+            Target.Level maxLevel = target.getLevelAt(maxNumberOfLevels - 1);
+            if (maxLevel != null) {
+                int targetLayoutSize = Math.min(targetLayoutWidth, targetLayoutHeight);
+                float maxLevelSizePercent = maxLevel.getSizePercent();
+                int maxLevelSize = Math.round(targetLayoutSize * maxLevelSizePercent);
+
+                computeDrawingBounds(maxLevelSize, maxLevelSize, maxLevelSizePercent);
+                maxLevelSize = Math.min(drawingBounds.width(), maxLevelSize);
+
+                targetLayoutWidth = resolveSize(maxLevelSize, widthMeasureSpec);
+                targetLayoutHeight = resolveSize(maxLevelSize, heightMeasureSpec);
+            }
+
 
             Target.Level level = target.getLevelAt(0);
             float sizePercent = level.getSizePercent();
-            int targetLayoutSize = Math.min(width, height);
+            int targetLayoutSize = Math.min(targetLayoutWidth, targetLayoutHeight);
             int centerViewSize = Math.round((targetLayoutSize * sizePercent));
 
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) centerView.getLayoutParams();
@@ -96,7 +112,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             int centerViewWidthMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - widthMargins, MeasureSpec.EXACTLY);
             int centerViewHeightMeasureSpec = MeasureSpec.makeMeasureSpec(centerViewSize - heightMargins, MeasureSpec.EXACTLY);
             centerView.measure(centerViewWidthMeasureSpec, centerViewHeightMeasureSpec);
-            setMeasuredDimension(width, height);
+            setMeasuredDimension(targetLayoutSize, targetLayoutSize);
         }
     }
 
@@ -110,7 +126,6 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         if (adapter != null && !adapter.isEmpty()) {
             Target.Level current = target.getCurrentLevel();
             if (current != null) {
-                fixStepPercentIfNeeded(canvasWidth, canvasHeight);
                 for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
                     // draw always from the first drawable to the last
                     levelListDrawable.setLevel(position - current.getPosition());
