@@ -1,4 +1,4 @@
-package com.ktsal.targetlayout;
+package com.tsalik.targetlayout;
 
 
 public interface TargetAction {
