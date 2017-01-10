@@ -66,7 +66,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
 
     @Override
     protected void onFinishInflate() {
-
+        super.onFinishInflate();
         if (getChildCount() > 1)
             throw new IllegalStateException("TargetLayout can have exactly one child");
 
