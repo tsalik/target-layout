@@ -25,7 +25,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TargetLayout extends FrameLayout implements TargetAction, View.OnTouchListener {
+public class TargetLayout extends FrameLayout implements TargetAction {
 
     private static final float DEFAULT_CENTER_PERCENT = 0F;
     private static final float DEFAULT_STEP_PERCENT = 0F;
@@ -66,7 +66,7 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
 
     @Override
     protected void onFinishInflate() {
-
+        super.onFinishInflate();
         if (getChildCount() > 1)
             throw new IllegalStateException("TargetLayout can have exactly one child");
 
@@ -158,10 +158,6 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
 
     public void allowGestureEvents(boolean allow) {
         allowGestureEvents = allow;
-        if (allowGestureEvents)
-            setOnTouchListener(this);
-        else
-            setOnTouchListener(null);
     }
 
     public void setOnLevelChangedListener(OnLevelChangedListener onLevelChangedListener) {
@@ -180,6 +176,18 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
         if (adapter != null)
             maxNumberOfLevels = Math.min(maxNumberOfLevels, adapter.getCount());
         updateTarget();
+    }
+
+    public int getCurrentPosition() {
+        return target.getCurrentLevel().getPosition();
+    }
+
+    public boolean hasReachedMaxLevel() {
+        return target.hasLowerBoundAtCurrent() && !target.hasUpperBoundAtCurrent();
+    }
+
+    public boolean hasReachedMinimumLevel() {
+        return target.hasUpperBoundAtCurrent() && !target.hasLowerBoundAtCurrent();
     }
 
     public void setCenterViewInterpolator(@NonNull Interpolator centerViewInterpolator) {
@@ -222,11 +230,8 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
             ta.recycle();
         }
 
-        if (allowGestureEvents) {
-            ScaleListener scaleListener = new ScaleListener();
-            scaleGestureDetector = new ScaleGestureDetector(context, scaleListener);
-            setOnTouchListener(this);
-        }
+        ScaleListener scaleListener = new ScaleListener();
+        scaleGestureDetector = new ScaleGestureDetector(context, scaleListener);
     }
 
     private void updateTarget() {
@@ -307,9 +312,10 @@ public class TargetLayout extends FrameLayout implements TargetAction, View.OnTo
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        scaleGestureDetector.onTouchEvent(event);
-        return true;
+    public boolean onTouchEvent(MotionEvent event) {
+        if (allowGestureEvents)
+            scaleGestureDetector.onTouchEvent(event);
+        return allowGestureEvents;
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
