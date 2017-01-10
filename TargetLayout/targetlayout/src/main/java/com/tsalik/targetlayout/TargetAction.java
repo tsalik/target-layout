@@ -1,7 +1,7 @@
 package com.tsalik.targetlayout;
 
 
-public interface TargetAction {
+interface TargetAction {
 
     void increment();
 

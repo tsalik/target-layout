@@ -178,6 +178,18 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         updateTarget();
     }
 
+    public int getCurrentPosition() {
+        return target.getCurrentLevel().getPosition();
+    }
+
+    public boolean hasReachedMaxLevel() {
+        return target.hasLowerBoundAtCurrent() && !target.hasUpperBoundAtCurrent();
+    }
+
+    public boolean hasReachedMinimumLevel() {
+        return target.hasUpperBoundAtCurrent() && !target.hasLowerBoundAtCurrent();
+    }
+
     public void setCenterViewInterpolator(@NonNull Interpolator centerViewInterpolator) {
         this.centerViewInterpolator = centerViewInterpolator;
     }

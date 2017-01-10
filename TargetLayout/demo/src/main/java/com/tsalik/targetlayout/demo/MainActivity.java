@@ -66,8 +66,19 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
 
     private GestureDetector.OnDoubleTapListener tapListener = new GestureDetector.OnDoubleTapListener() {
 
+        private boolean grow = true;
+
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (targetLayout.hasReachedMaxLevel())
+                grow = false;
+            else if (targetLayout.hasReachedMinimumLevel())
+                grow = true;
+
+            if (grow)
+                targetLayout.increment();
+            else
+                targetLayout.decrement();
 
             return false;
         }
