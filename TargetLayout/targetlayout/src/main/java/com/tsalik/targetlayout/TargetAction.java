@@ -8,4 +8,5 @@ public interface TargetAction {
     void setPosition(int position);
 
     void decrement();
+
 }
