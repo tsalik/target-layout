@@ -1,6 +1,6 @@
 package com.tsalik.targetlayout.demo;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        targetLayout = (TargetLayout) findViewById(R.id.targetLayout);
+        targetLayout = findViewById(R.id.targetLayout);
         findViewById(R.id.increment).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
         for (int i = 0; i < 4; i++) {
             programmerLevels.add(new ProgrammerLevel(i, "level: " + i));
         }
-        programmerLevelTextView = (TextView) findViewById(R.id.programmerLevel);
+        programmerLevelTextView = findViewById(R.id.programmerLevel);
         targetLayout.setOnLevelChangedListener(this);
         ArrayAdapter<ProgrammerLevel> programmerLevelArrayAdapter = new ArrayAdapter<>();
         targetLayout.setAdapter(programmerLevelArrayAdapter);

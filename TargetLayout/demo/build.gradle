@@ -1,15 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.ktsal.targetlayout.demo"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -25,12 +24,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.tsalik.targetlayout:targetlayout:1.0.1'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
-    testCompile 'junit:junit:4.12'
+    implementation project(':targetlayout')
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    testImplementation 'junit:junit:4.12'
 }
