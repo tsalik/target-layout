@@ -13,7 +13,7 @@ android {
     lintOptions {
         textReport true
         abortOnError true
-        warningsAsErrors true
+        warningsAsErrors false
     }
 
     defaultConfig {

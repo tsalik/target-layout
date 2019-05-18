@@ -18,9 +18,9 @@ android {
         }
     }
     lintOptions {
-        htmlReport true
+        textReport true
         abortOnError true
-        warningsAsErrors true
+        warningsAsErrors false
     }
 }
 
