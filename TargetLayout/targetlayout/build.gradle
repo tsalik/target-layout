@@ -10,6 +10,12 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
 
+    lintOptions {
+        htmlReport true
+        abortOnError true
+        warningsAsErrors true
+    }
+
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 25
