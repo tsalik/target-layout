@@ -11,7 +11,7 @@ android {
     buildToolsVersion "24.0.3"
 
     lintOptions {
-        htmlReport true
+        textReport true
         abortOnError true
         warningsAsErrors true
     }
