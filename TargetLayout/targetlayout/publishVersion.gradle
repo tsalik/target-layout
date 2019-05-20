@@ -78,7 +78,9 @@ project.afterEvaluate {
 
         bintray {
             Properties localProperties = new Properties()
-            localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+            if (project.rootProject.file('local.properties').exists()) {
+                localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+            }
             user = localProperties.getProperty("bintray.user")
             key = localProperties.getProperty("bintray.apikey")
             pkg {
@@ -88,7 +90,7 @@ project.afterEvaluate {
                 vcsUrl = 'https://github.com/tsalik/target-layout.git'
                 version {
                     name = "1.0.2"
-                    released  = new Date()
+                    released = new Date()
                 }
             }
             publications = ['targetlayout']
