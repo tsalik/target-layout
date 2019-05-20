@@ -38,4 +38,4 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - "./gradlew :targetlayout:clean :targetlayout:assembleRelease :targetlayout:test :targetlayout:lint"
+  - "./gradlew :targetlayout:clean :targetlayout:build"
