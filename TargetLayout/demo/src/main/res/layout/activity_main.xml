@@ -5,7 +5,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -15,12 +14,13 @@
 
     <com.tsalik.targetlayout.TargetLayout
         android:id="@+id/targetLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:center_percent="0.45"
         app:levelDrawable="@drawable/levels"
         app:max_number_of_levels="10"
-        app:step_percent="0.2">
+        app:step_percent="0.2"
+        android:layout_gravity="center_horizontal">
 
         <TextView
             android:id="@+id/programmerLevel"
@@ -54,5 +54,16 @@
             android:text="@string/decrement" />
 
     </LinearLayout>
+
+    <com.ramotion.fluidslider.FluidSlider
+        android:id="@+id/fluidSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:elevation="2dp"
+        app:duration="@android:integer/config_mediumAnimTime"
+        app:size="small"
+        tools:targetApi="lollipop" />
 
 </LinearLayout>

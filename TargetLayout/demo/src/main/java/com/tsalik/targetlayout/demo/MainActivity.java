@@ -1,16 +1,22 @@
 package com.tsalik.targetlayout.demo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ramotion.fluidslider.FluidSlider;
 import com.tsalik.targetlayout.TargetLayout;
 
 import java.util.Locale;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class MainActivity extends AppCompatActivity implements TargetLayout.OnLevelChangedListener {
 
@@ -18,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
     private TextView programmerLevelTextView;
     private GestureDetector gestureDetector;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
         });
         programmerLevelTextView = findViewById(R.id.programmerLevel);
         targetLayout.setOnLevelChangedListener(this);
-        targetLayout.setMaxNumberOfLevels(5);
+        targetLayout.setMaxNumberOfLevels(4);
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {});
         gestureDetector.setOnDoubleTapListener(tapListener);
         targetLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -45,6 +52,28 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
             public boolean onTouch(View v, MotionEvent event) {
                 gestureDetector.onTouchEvent(event);
                 return false;
+            }
+        });
+        setupSlider();
+    }
+
+    private void setupSlider() {
+        final FluidSlider fluidSlider = findViewById(R.id.fluidSlider);
+        fluidSlider.setPositionListener(new Function1<Float, Unit>() {
+            @Override
+            public Unit invoke(Float position) {
+                float stepPercent = position * targetLayout.getMaxStepPercent();
+                fluidSlider.setBubbleText(String.format(Locale.getDefault(), "%.1f%%", stepPercent * 100));
+                targetLayout.setStepPercent(stepPercent);
+                return null;
+            }
+        });
+        fluidSlider.setStartText("0");
+        targetLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                fluidSlider.setEndText(String.format(Locale.getDefault(), "%.1f%%", targetLayout.getMaxStepPercent() * 100));
+                targetLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }

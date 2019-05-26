@@ -251,6 +251,23 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         }
     }
 
+    private float calculateMaxStepPercent(int width, int height) {
+        int maxViewSize = Math.min(width, height);
+        Target.Level maxLevel = target.getLevelAt(maxNumberOfLevels - 1);
+        Target.Level centerLevel = target.getLevelAt(0);
+        if (maxLevel != null && centerLevel != null) {
+            computeDrawingBounds(width, height, maxLevel.getSizePercent());
+            int maxLevelSize = drawingBounds.width();
+            computeDrawingBounds(width, height, centerLevel.getSizePercent());
+            int centerSize = drawingBounds.width();
+            float stepPercent =  (float) (maxViewSize - centerSize) / (maxViewSize * (maxNumberOfLevels - 1));
+            updateTarget();
+            return stepPercent;
+        } else {
+            return stepPercent;
+        }
+    }
+
     private void animateLevelTransition() {
         float scaleFrom = centerView.getScaleX();
         Target.Level currentLevel = target.getCurrentLevel();
@@ -296,6 +313,15 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         if (allowGestureEvents)
             scaleGestureDetector.onTouchEvent(event);
         return allowGestureEvents;
+    }
+
+    public float getMaxStepPercent() {
+        return calculateMaxStepPercent(getWidth(), getHeight());
+    }
+
+    public void setStepPercent(float stepPercent) {
+        this.stepPercent = stepPercent;
+        requestLayout();
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
