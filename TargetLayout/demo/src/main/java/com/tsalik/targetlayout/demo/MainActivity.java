@@ -1,21 +1,20 @@
 package com.tsalik.targetlayout.demo;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.tsalik.targetlayout.TargetLayout;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements TargetLayout.OnLevelChangedListener {
 
     private TargetLayout targetLayout;
-    private List<ProgrammerLevel> programmerLevels;
     private TextView programmerLevelTextView;
     private GestureDetector gestureDetector;
 
@@ -36,18 +35,11 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
                 targetLayout.decrement();
             }
         });
-        programmerLevels = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            programmerLevels.add(new ProgrammerLevel(i, "level: " + i));
-        }
         programmerLevelTextView = findViewById(R.id.programmerLevel);
         targetLayout.setOnLevelChangedListener(this);
-        ArrayAdapter<ProgrammerLevel> programmerLevelArrayAdapter = new ArrayAdapter<>();
-        targetLayout.setAdapter(programmerLevelArrayAdapter);
-        programmerLevelArrayAdapter.updateItems(programmerLevels);
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){});
+        targetLayout.setMaxNumberOfLevels(5);
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {});
         gestureDetector.setOnDoubleTapListener(tapListener);
-        targetLayout.setPosition(1);
         targetLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -60,8 +52,7 @@ public class MainActivity extends AppCompatActivity implements TargetLayout.OnLe
 
     @Override
     public void onLevelChanged(int position) {
-        ProgrammerLevel programmerLevel = programmerLevels.get(position);
-        programmerLevelTextView.setText(programmerLevel.getTitle());
+        programmerLevelTextView.setText(String.format(Locale.getDefault(), "Level: %d", position));
     }
 
     private GestureDetector.OnDoubleTapListener tapListener = new GestureDetector.OnDoubleTapListener() {

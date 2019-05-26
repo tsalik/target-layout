@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:maxLevel="0" android:drawable="@drawable/ring_color_accent"/>
-    <item android:maxLevel="1" android:drawable="@drawable/ring_color_primary"/>
-    <item android:maxLevel="2" android:drawable="@drawable/ring_color_dark"/>
-    <item android:maxLevel="3" android:drawable="@drawable/ring_color_black"/>
+    <item
+        android:drawable="@drawable/ring_color_accent"
+        android:maxLevel="0" />
+    <item
+        android:drawable="@drawable/ring_color_primary"
+        android:maxLevel="1" />
+    <item
+        android:drawable="@drawable/ring_color_dark"
+        android:maxLevel="2" />
+    <item
+        android:drawable="@drawable/ring_color_black"
+        android:maxLevel="3" />
+    <item
+        android:drawable="@drawable/ring_color_black"
+        android:maxLevel="999" />
 </level-list>

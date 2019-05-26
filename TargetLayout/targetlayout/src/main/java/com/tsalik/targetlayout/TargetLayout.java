@@ -6,12 +6,10 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
-import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -19,8 +17,9 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +44,6 @@ public class TargetLayout extends FrameLayout implements TargetAction {
     private ScaleGestureDetector scaleGestureDetector;
     private float scaleFactor = 1f;
     private OnLevelChangedListener onLevelChangedListener;
-    private BaseAdapter adapter;
-    private DataSetObserver dataSetObserver = new DataSetObserver() {
-        @Override
-        public void onChanged() {
-            updateMaxNumberOfLevels();
-            notifyLevelChanged();
-        }
-    };
 
     public TargetLayout(Context context) {
         super(context);
@@ -116,6 +107,11 @@ public class TargetLayout extends FrameLayout implements TargetAction {
         }
     }
 
+    public void setMaxNumberOfLevels(int maxNumberOfLevels) {
+        this.maxNumberOfLevels = maxNumberOfLevels;
+        redraw();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -123,17 +119,15 @@ public class TargetLayout extends FrameLayout implements TargetAction {
 
         int canvasHeight = canvas.getHeight();
 
-        if (adapter != null && !adapter.isEmpty()) {
-            Target.Level current = target.getCurrentLevel();
-            if (current != null) {
-                for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
-                    // draw always from the first drawable to the last
-                    levelListDrawable.setLevel(position - current.getPosition());
-                    Drawable drawable = levelListDrawable.getCurrent();
-                    computeDrawingBounds(canvasWidth, canvasHeight, target.getLevelAt(position).getSizePercent());
-                    drawable.setBounds(drawingBounds);
-                    drawable.draw(canvas);
-                }
+        Target.Level current = target.getCurrentLevel();
+        if (current != null) {
+            for (int position = current.getPosition(); position < maxNumberOfLevels; position++) {
+                // draw always from the first drawable to the last
+                levelListDrawable.setLevel(position - current.getPosition());
+                Drawable drawable = levelListDrawable.getCurrent();
+                computeDrawingBounds(canvasWidth, canvasHeight, target.getLevelAt(position).getSizePercent());
+                drawable.setBounds(drawingBounds);
+                drawable.draw(canvas);
             }
         }
     }
@@ -162,20 +156,6 @@ public class TargetLayout extends FrameLayout implements TargetAction {
 
     public void setOnLevelChangedListener(OnLevelChangedListener onLevelChangedListener) {
         this.onLevelChangedListener = onLevelChangedListener;
-    }
-
-    public void setAdapter(@NonNull BaseAdapter baseAdapter) {
-        if (adapter != null)
-            adapter.unregisterDataSetObserver(dataSetObserver);
-
-        adapter = baseAdapter;
-        adapter.registerDataSetObserver(dataSetObserver);
-    }
-
-    public void updateMaxNumberOfLevels() {
-        if (adapter != null)
-            maxNumberOfLevels = Math.min(maxNumberOfLevels, adapter.getCount());
-        updateTarget();
     }
 
     public int getCurrentPosition() {
