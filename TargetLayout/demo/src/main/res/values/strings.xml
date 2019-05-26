@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TargetLayout</string>
+    <string name="increment">increment</string>
+    <string name="decrement">decrement</string>
 </resources>
